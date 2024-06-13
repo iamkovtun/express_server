@@ -14,42 +14,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const sequelize_1 = require("sequelize");
+const task_1 = require("./models/task");
+const tasks_1 = __importDefault(require("./routes/tasks"));
 const app = (0, express_1.default)();
-const port = 3000;
+const port = process.env.PORT || 3000;
 const sequelize = new sequelize_1.Sequelize('postgres', 'postgres', '1111', {
     host: 'localhost',
     dialect: 'postgres'
 });
-const Task = sequelize.define('Task', {
-    id: {
-        type: sequelize_1.DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true
-    },
-    title: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: false
-    },
-    description: {
-        type: sequelize_1.DataTypes.STRING,
-        allowNull: false
-    },
-    completed: {
-        type: sequelize_1.DataTypes.BOOLEAN,
-        allowNull: false,
-        defaultValue: false
-    }
-});
 app.use(express_1.default.json());
-app.get('/tasks', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const tasks = yield Task.findAll();
-    res.json(tasks);
-}));
-app.post('/tasks', (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { title, description } = req.body;
-    const task = yield Task.create({ title, description });
-    res.json(task);
-}));
+//Task model
+(0, task_1.initTaskModel)(sequelize);
+app.use('/tasks', tasks_1.default);
 app.listen(port, () => __awaiter(void 0, void 0, void 0, function* () {
     yield sequelize.sync();
     console.log(`Server is running on http://localhost:${port}`);
