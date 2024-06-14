@@ -1,47 +1,14 @@
-import { Router, Request, Response } from 'express';
-import { Task } from '../models/task'; 
+import { Router } from 'express';
+import { getAllTasks, createTask, updateTask, deleteTask } from '../controllers/taskController';
 
-const router = Router();
+const router: Router = Router();
 
-// Route to get all tasks
-router.get('/', async (req: Request, res: Response) => {
-  const tasks = await Task.findAll();
-  res.json(tasks);
-});
+router.get('/', getAllTasks);
 
-// Route to create a new task
-router.post('/', async (req: Request, res: Response) => {
-  const {title, description} = req.body;
-  const task = await Task.create({ title, description });
-  res.json(task);
-});
+router.post('/', createTask);
 
-// Route to upgrade a task
-router.put('/:id', async (req: Request, res: Response) => {
-    const { id } = req.params;
-    const { title, description, completed} = req.body;
-    const task = await Task.findByPk(id);
-    if (task) {
-      task.title = title;
-      task.description = description;
-      task.completed = completed;
-      await task.save();
-      res.json(task);
-    } else {
-      res.status(404).send('Task not found');
-    }
-  });
+router.put('/:id', updateTask);
 
-// Route to delete a task
-router.delete('/:id', async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const task = await Task.findByPk(id);
-  if (task) {
-    await task.destroy();
-    res.status(204).send();
-  } else {
-    res.status(404).send('Task not found');
-  }
-});
+router.delete('/:id', deleteTask);
 
 export default router;
